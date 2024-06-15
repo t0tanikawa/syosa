@@ -1,0 +1,48 @@
+._slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  background: transparent;
+  outline: none;
+  cursor: pointer;
+}
+
+._slider:focus {
+  outline: none;
+}
+
+._slider::-webkit-slider-runnable-track {
+  height: 0.2rem;
+  border-radius: 0.2rem;
+}
+
+._slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 0.8rem;
+  height: 0.8rem;
+  margin-top: -4px;
+  background-color: var(--bs-white);
+  border: none;
+}
+
+._slider:focus::-webkit-slider-thumb {
+  outline: none;
+}
+
+._slider::-moz-range-track {
+  height: 0.2rem;
+  border-radius: 0.2rem;
+}
+
+._slider::-moz-range-thumb {
+  width: 0.8rem;
+  height: 0.8rem;
+  background-color: var(--bs-white);
+  border: none;
+}
+
+._slider:focus::-moz-range-thumb {
+  outline: none;
+}
+

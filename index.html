@@ -1,112 +1,346 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html data-bs-theme="light" lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <title>syosa: 非言語情報の抽出・可視化ツール</title>
-    <meta name="keywords" content="ページのキーワードA,B,C">
-    <meta name="description" content="人物による活動や発言が含まれる映像資料から登場人物の非言語情報を可視化するツールのページ">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="css/stylesheet.css">
+    <meta charset="utf-8">
+<script src="library/chart_4.4.2.umd.js"></script>
+<script src="library/hammer_2.0.8.min.js"></script>
+<script src="library/moment_2.30.1.min.js"></script>
+<script src="library/chartjs-adapter-moment_1.0.1.min.js"></script>
+<script src="library/chartjs-plugin-zoom_2.0.1.min.js"></script>
+<script src="library/human_3.2.2.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>syosa</title>
+    <meta name="dndexcludeids" content="fileinput">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon.png">
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="assets/fonts/ionicons.min.css">
+    <link rel="stylesheet" href="assets/css/splash.css">
+    <link rel="stylesheet" href="assets/css/fileinput.css">
+    <link rel="stylesheet" href="assets/css/roundcheck.css">
+    <link rel="stylesheet" href="assets/css/slider.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/timeline.css">
+    <link rel="stylesheet" href="assets/css/toggle.css">
+    <link rel="stylesheet" href="assets/css/tooltip.css">
 </head>
 
 <body>
-    <div id="outer">
-        <header>
-            <h1 id="tool-title">syosa: 非言語情報の抽出・可視化ツール</h1>
-            <p>人物による活動や発言が含まれる映像資料から登場人物の非言語情報を可視化するツール</p>
-        </header>
-        <div id="content">
-            <div class="inner">
-                <h1 id="tool-info">ツールについて</h1>
-                <a href="https://github.com/t0tanikawa/syosa/tree/main">実行ファイルはこちら</a>
-                <h2 id="tool-summary">概要</h2>
-                <p>本ツール(syosa)は，人物による活動や発言が含まれる映像資料から，機械学習を用いた動画解析により登場人物の本人の表情や視線，瞬き，動作といった非言語情報の抽出を行い，音声認識による言語情報ともにタイムラインデータとして保存可能とする．
-                </p>
-                <p>本ツールはWebサーバー上に実行可能な形で置くことで，Webページの形で利用可能となる．利用者がページにアクセスすると映像資料のファイルを指定することで登場人物の非言語情報の解析が行われる．読み込まれたデータはサーバーにアップロードはされず，利用者がアクセスしている計算機資源を使って処理が行われ，いかなる利用履歴やデータ収集も行われない．
-                </p>
-                <img src="assets/syosa-process.png" alt="解析処理画面" style="width:100%;">
-
-
-                <h2 id="tool-result">解析結果</h2>
-                <p>非言語情報を抽出するため，映像から以下の通りの情報を取得することが可能になっている．顔の表情は登場人物の感情を反映しているため極めて重要である．首の動きや瞳の方向をトレースすることで，相手への関心の高さや心理状態などを得られる可能性がある．また手の動きや体といった身振り手振りによる情報は非言語コミュニケーションの重要な要素である．口の開口率については感情や声の強さなどを表し伝えたい内容の理解において有用である．その他，年齢や性別，人物同定はコミュニケーションの理解を支援するために行った．
-                </p>
-
-                <ul>
-                    <li>身体および顔のランドマークの座標</li>
-                    <li>顔の姿勢</li>
-                    <li>顔、身体、手のジェスチャー（状態）</li>
-                    <li>瞳の方向</li>
-                    <li>口の開口率</li>
-                    <li>性別推定</li>
-                    <li>年齢推定</li>
-                    <li>人物同定</li>
-                    <li>物体（オブジェクト認識）</li>
-                    <li>表情</li>
-                </ul>
-                <img src="assets/syosa-visualization.png" alt="解析結果のビジュアライゼーション" style="width:100%;">
-
-
-                <p>
-                    また，認識した結果をタイムグラフに合わせて表示でき，必要に応じて可視化内容は変更できる．表情は，基本的な6つの感情（怒り・嫌悪・恐怖・喜び・悲しみ・驚き）の比率で表示される．横軸のタイムスケールは拡大縮小可能である．身体情報としては，頷きなどに関連する頭部の姿勢情報の可視化される．ジェスチャーについても認識したものをタイムライン上に表示される．
-                </p>
-                <p>言語情報については，時間指定のテキストトラック（字幕やキャプションなど）を表示するためのウェブビデオテキストトラック形式 (WebVTT) を読み込むことで対応する．</p>
-
-                <h2 id="tool-acknowledgment">謝辞</h2>
-                <p>本ツールは，<a href="https://www.nihu.jp/"
-                        target="_blank">大学共同利用機関法人人間文化研究機構</a>の2023年度デジタル・ヒューマニティーズ(DH)研究等補助事業の支援を受けて開発された．</p>
-
-                <h2 id="tool-license">ライセンス</h2>
-                <p>プログラムおよび学習データについて以下のライセンス形態により個人利用および非商用利用において公開・使用・再配布を行う</p>
-                <p><small>
-                        Human Library: MIT License<br>
-                        SSR-Net: Apache License Version 2<br>
-                        Real-of-Fake: 未使用（Face Anti-Spoofing）<br>
-                        BlazePose: Apache License Version 2<br>
-                        EfficientPose: Apache License Version 2<br>
-                        MoveNet: Apache License Version 2(TensorFlow)<br>
-                        PoseNet: Apache License Version 2(TensorFlow)<br>
-                        MediaPipe Meet: Google Terms of Service<br>
-                        MediaPipe Selfie: Apache License Version 2<br>
-                        Robust Video Matting: GNU General Public License v3.0<br>
-                        Oarriaga: MIT License<br>
-                        HSE-AffectNet: Apache License Version 2<br>
-                        MediaPipe Iris: Apache License Version 2<br>
-                        HSE-FaceRes: Apache License Version 2<br>
-                        MediaPipe BlazeFace: Apache License Version 2<br>
-                        BecauseofAI MobileFace: MIT License<br>
-                        DeepInsight InsightFace: MIT License<br>
-                        MediaPipe FaceMesh: Apache License Version 2<br>
-                        MediaPipe FaceMesh Attention Variation: Apache License Version 2<br>
-                        GEAR Predictor: GNU General Public License v3.0<br>
-                        MediaPipe HandPose: Apache License Version 2<br>
-                        HandTracking: MIT License<br>
-                        WebGLImageFilter: MIT License<br>
-                        MB3-CenterNet: 未使用（Object Detection）<br>
-                        NanoDet: Apache License Version 2<br>
-                        Pinto: MIT License<br>
-                        CanvasJS: 個人利用・非商用利用は無償（クレジットおよびリンク必須）<br>
-                        Bootstrap: MIT License<br>
-                    </small></p>
-
+    <div class="vstack" style="background: url(&quot;assets/img/22395155.png&quot;);">
+        <div class="container">
+            <div class="row justify-content-between">
+                <div class="col-auto d-flex align-items-end"><img src="assets/img/2002658s.png" style="height: 10rem;filter: drop-shadow(0.1rem 0.1rem 0.125rem);"></div>
+                <div class="col-auto d-flex align-items-end"><span style="font-size: 5rem;color: var(--bs-primary);font-weight: lighter;margin-bottom: -1.5rem;">syosa</span></div>
             </div>
         </div>
-        <aside>
-            <div class="right-title">syosa</div>
-            <div class="link">
-                <ul>
-                    <li><a href="#tool-title">ツールについて</a></li>
-                    <li><a href="#tool-summary">概要</a></li>
-                    <li><a href="#tool-result">解析結果</a></li>
-                    <li><a href="#tool-acknowledgment">謝辞</a></li>
-                    <li><a href="#tool-license">ライセンス</a></li>
-                </ul>
-            </div>
-        </aside>
-        <footer>t0tanikawa</footer>
     </div>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col">
+                <h1 class="fs-4">使い方</h1>
+                <p><span style="color: rgb(33, 37, 41);">解析したい動画を選んで&nbsp;[解析を始める] ボタンを押すと解析が始まります.</span><br><span style="color: rgb(33, 37, 41);">お使いのブラウザーに対応した動画ファイルを読み込むことができます(Chrome, Edge, Safariは.mp4, .webm, .ogvに対応しています).</span><br><span style="color: rgb(33, 37, 41);">解析結果のグラフはShiftキーを押しながらマウスホイールを回転すると拡大縮小できます. またShiftキーを押しながらドラッグすると選択した範囲を拡大することができます. グラフをクリックすると動画がシークします.</span><br><span style="color: rgb(33, 37, 41);">字幕ファイル(.vttファイル)がある場合は, 読み込むことで字幕を表示させることができます. 字幕の時刻をクリックすると動画がシークします.</span><br><span style="color: rgb(33, 37, 41);">詳細は</span><a href="https://github.com/t0tanikawa/syosa"><span style="color: rgba(var(--bs-link-color-rgb),var(--bs-link-opacity,1));">こちら</span></a><span style="color: rgb(33, 37, 41);">をご覧ください.</span></p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col d-flex justify-content-center align-items-center"><input type="file" id="fileinput" class="_fileinput" _addon="fileloader" _videoid="vidSource" _timelineid="divTimeline" _analyzerid="divAnalyzer" multiple="" accept="video/*,.vtt,.syosa"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none">
+                    <path d="M11 5C11 4.44772 11.4477 4 12 4C12.5523 4 13 4.44772 13 5V12.1578L16.2428 8.91501L17.657 10.3292L12.0001 15.9861L6.34326 10.3292L7.75748 8.91501L11 12.1575V5Z" fill="currentColor"></path>
+                    <path d="M4 14H6V18H18V14H20V18C20 19.1046 19.1046 20 18 20H6C4.89543 20 4 19.1046 4 18V14Z" fill="currentColor"></path>
+                </svg><label class="form-label"><strong>ここをクリックしてファイルを選択してください</strong><br><strong>ここにファイルを直接ドラッグ&amp;ドロップすることもできます</strong></label></div>
+        </div>
+        <div class="row gx-2 align-items-center p-2">
+            <div class="col-auto"><small>動画や字幕ファイルのURLを指定して読み込む場合はこちら</small></div>
+            <div class="col-auto"><i class="icon ion-arrow-right-a fs-5"></i></div>
+            <div class="col"><input type="url" class="w-100" placeholder="https://www.example.com/movie.mp4" _addon="fileloader" _videoid="vidSource" _timelineid="divTimeline" _analyzerid="divAnalyzer" _buttonid="btnURL"></div>
+            <div class="col-auto"><button class="btn btn-secondary btn-sm" id="btnURL" type="button">読み込み</button></div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-8" id="divAnalyzerColumn">
+                <div class="row">
+                    <div class="col"><video class="d-none" id="vidSource" width="560" height="315"></video>
+                        <div class="d-flex justify-content-center align-items-center w-100" id="divAnalyzer" _addon="analyzer" _videoid="vidSource" _graphid="divGraph" _splashid="divSplash" _stopbuttonid="btnStop" _analyzemodalbuttonid="btnAnalyzeModal" _analyzebuttonid="btnAnalyze" _keeppersoncheckboxid="chkKeepPerson" _addbuttonid="btnAdd" _deletebuttonid="btnDelete" _mergebuttonid="btnMerge" _savemodalbuttonid="btnSaveModal" _savebuttonid="btnSave" _loadmodalid="mdlLoad" _loadbuttonid="btnLoad" _drawhumancheckboxid="chkDrawHuman" _frameraterangeid="rngFramerate" _maxdetectedrangeid="rngMaxDetected" _facescorerangeid="rngFaceScore" _similarityrangeid="rngSimilarity"><canvas style="width: 100%;" tabindex="1"></canvas>
+<span style="position: absolute;">動画ファイルが読み込まれていません</span></div>
+                    </div>
+                </div>
+                <div _addon="videocontroller" _videoid="vidSource" _frameraterangeid="rngFramerate">
+                    <div class="row gx-0 text-bg-dark align-items-center">
+                        <div class="col-auto d-flex mx-1">
+                            <div class="form-check _toggleplay"><input class="form-check-input" type="checkbox" id="chkPlay" disabled=""><label class="form-check-label" for="chkPlay"></label></div>
+                        </div>
+                        <div class="col-auto d-flex mx-1"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-skip-backward-fill _clickable-icon" style="font-size: 1.2rem;">
+                                <path d="M.5 3.5A.5.5 0 0 0 0 4v8a.5.5 0 0 0 1 0V8.753l6.267 3.636c.54.313 1.233-.066 1.233-.697v-2.94l6.267 3.636c.54.314 1.233-.065 1.233-.696V4.308c0-.63-.693-1.01-1.233-.696L8.5 7.248v-2.94c0-.63-.692-1.01-1.233-.696L1 7.248V4a.5.5 0 0 0-.5-.5"></path>
+                            </svg></div>
+                        <div class="col d-flex"><input class="form-range _slider" type="range" id="rngSeek" min="0" max="1" value="0" disabled="" step="0.01"></div>
+                        <div class="col-auto d-flex mx-1"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-skip-forward-fill _clickable-icon" style="font-size: 1.2rem;">
+                                <path d="M15.5 3.5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V8.753l-6.267 3.636c-.54.313-1.233-.066-1.233-.697v-2.94l-6.267 3.636C.693 12.703 0 12.324 0 11.693V4.308c0-.63.693-1.01 1.233-.696L7.5 7.248v-2.94c0-.63.693-1.01 1.233-.696L15 7.248V4a.5.5 0 0 1 .5-.5"></path>
+                            </svg></div>
+                        <div class="col-auto d-flex mx-1"><span id="txtTimecode" style="font-size: 12px;">00:00:00 / 00:00:00</span></div>
+                        <div class="col-auto d-flex mx-1">
+                            <div class="form-check _togglemute"><input class="form-check-input" type="checkbox" id="chkMute"><label class="form-check-label" for="chkMute"></label></div>
+                        </div>
+                        <div class="col-1 d-flex mx-1"><input class="form-range _slider" type="range" id="rngVolume" min="0" max="1" step="0.01"></div>
+                        <div class="col-auto d-flex mx-1"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-box-arrow-down-right _clickable-icon" style="font-size: 1rem;">
+                                <path fill-rule="evenodd" d="M8.636 12.5a.5.5 0 0 1-.5.5H1.5A1.5 1.5 0 0 1 0 11.5v-10A1.5 1.5 0 0 1 1.5 0h10A1.5 1.5 0 0 1 13 1.5v6.636a.5.5 0 0 1-1 0V1.5a.5.5 0 0 0-.5-.5h-10a.5.5 0 0 0-.5.5v10a.5.5 0 0 0 .5.5h6.636a.5.5 0 0 1 .5.5"></path>
+                                <path fill-rule="evenodd" d="M16 15.5a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1 0-1h3.793L6.146 6.854a.5.5 0 1 1 .708-.708L15 14.293V10.5a.5.5 0 0 1 1 0z"></path>
+                            </svg></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="row">
+                    <div class="col me-2" style="overflow: scroll;" _addon="autoheight" _sourceid="divAnalyzerColumn" _offset="-20">
+                        <div id="divTimeline" _addon="timeline autoscroll" _videoid="vidSource" _autoscrollcheckboxid="chkAutoscroll"><ul class="_timeline">
+    <template>
+        <li class="_timeline-item bg-white rounded p-3 shadow">
+            <h2 class="h5 mb-0"></h2>
+            <span class="small text-black-50 _timeline-time"><i class="fa fa-clock-o me-1"></i><span></span></span>
+            <p class="text-small mt-1 font-weight-light"></p>
+        </li>
+    </template>
+        <li class="_timeline-item bg-white rounded p-3 shadow">
+            <h2 class="h5 mb-0"></h2>
+            <span class="small text-black-50 _timeline-time"><i class="fa fa-clock-o me-1"></i><span></span></span>
+            <p class="text-small mt-1 font-weight-light">字幕ファイルを読み込むと<br>ここにタイムラインが表示されます</p>
+        </li>
+</ul>
+</div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="_tooltip">
+                            <div class="form-check"><input class="form-check-input" type="checkbox" id="chkAutoscroll"><label class="form-check-label" for="chkAutoscroll" style="font-size: 12px;">再生に合わせて自動的にスクロールする</label></div><span class="_tooltip-text">チェックを入れると動画の位置に合わせて<br>字幕が自動的にスクロールします</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row p-4">
+            <div class="col d-flex justify-content-center"><button class="btn btn-primary disabled fs-4 w-50" id="btnAnalyzeModal" type="button" data-bs-target="#mdlAnalyze" data-bs-toggle="modal" disabled="">解析を始める</button></div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col">
+                <div id="divGraph" _addon="graph" _uncheckallbuttonid="btnUncheckAll" _resetzoombuttonid="btnResetZoom" _deletemodalbuttonid="btnDeleteModal" _mergemodalbuttonid="btnMergeModal" _syncgraphcheckboxid="chkSyncGraph"><template>
+    <div class="row">
+        <div class="col-auto d-flex flex-column justify-content-center align-items-start">
+            <div style="position: relative;">
+                <div class="form-check _roundcheck"><input id="chkMerge" class="form-check-input" type="checkbox" /><label class="form-check-label" for="chkMerge"><img /></label></div>
+            </div><input class="border-0" type="text" style="font-size: 12px;width: 64px;" />
+        </div>
+        <div class="col">
+            <div>
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item" role="presentation"><a class="nav-link active" role="tab" data-bs-toggle="tab" href="#tab-1">感情</a></li>
+                    <li class="nav-item" role="presentation"><a class="nav-link" role="tab" data-bs-toggle="tab" href="#tab-2">顔の向き</a></li>
+                    <li class="nav-item" role="presentation"><a class="nav-link" role="tab" data-bs-toggle="tab" href="#tab-3">ジェスチャー</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div id="tab-1" class="tab-pane active" role="tabpanel"><canvas></canvas></div>
+                    <div id="tab-2" class="tab-pane" role="tabpanel"><canvas></canvas></div>
+                    <div id="tab-3" class="tab-pane" role="tabpanel"><canvas></canvas></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+</div>
+            </div>
+        </div>
+        <hr>
+        <div class="row gx-2">
+            <div class="col-auto"><button class="btn btn-secondary btn-sm" id="btnUncheckAll" type="button">全選択解除</button></div>
+            <div class="col-auto"><button class="btn btn-secondary btn-sm" id="btnResetZoom" type="button">ズームリセット</button></div>
+        </div>
+        <div class="row gx-2 justify-content-between align-items-center py-2">
+            <div class="col-auto">
+                <div class="_tooltip"><button class="btn btn-primary btn-sm disabled p-0" id="btnAdd" type="button" disabled=""><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-person-fill-add fs-3">
+                            <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0m-2-6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"></path>
+                            <path d="M2 13c0 1 1 1 1 1h5.256A4.493 4.493 0 0 1 8 12.5a4.49 4.49 0 0 1 1.544-3.393C9.077 9.038 8.564 9 8 9c-5 0-6 3-6 4"></path>
+                        </svg></button><span class="_tooltip-text">現在表示されているシーンから人物を抽出します</span></div>
+            </div>
+            <div class="col-auto">
+                <div class="_tooltip"><button class="btn btn-primary btn-sm disabled p-0" id="btnDeleteModal" type="button" data-bs-target="#mdlDelete" data-bs-toggle="modal" disabled=""><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-person-fill-dash fs-3">
+                            <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7M11 12h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1 0-1m0-7a3 3 0 1 1-6 0 3 3 0 0 1 6 0"></path>
+                            <path d="M2 13c0 1 1 1 1 1h5.256A4.493 4.493 0 0 1 8 12.5a4.49 4.49 0 0 1 1.544-3.393C9.077 9.038 8.564 9 8 9c-5 0-6 3-6 4"></path>
+                        </svg></button><span class="_tooltip-text">選択されている人物を削除します</span></div>
+            </div>
+            <div class="col-auto">
+                <div class="_tooltip"><button class="btn btn-primary btn-sm disabled" id="btnMergeModal" type="button" data-bs-target="#mdlMerge" data-bs-toggle="modal" disabled="">人物を統合する</button><span class="_tooltip-text">選択されている2人以上の人物を統合します<br>最初に選択した(ハイライトされた)サムネイルが残ります</span></div>
+            </div>
+            <div class="col-auto"><button class="btn btn-primary btn-sm disabled" id="btnSaveModal" type="button" data-bs-target="#mdlSave" data-bs-toggle="modal" disabled="">解析結果を保存する</button></div>
+            <div class="col"></div>
+            <div class="col-auto"><button class="btn btn-primary btn-sm" type="button" data-bs-target="#mdlSettings" data-bs-toggle="offcanvas">設定</button></div>
+        </div>
+    </div>
+    <div class="modal fade" role="dialog" tabindex="-1" id="mdlAnalyze">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">解析を始める</h4><button class="btn-close" type="button" aria-label="Close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>現在の解析結果はクリアされます.<br>よろしいですか？</p>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" id="chkKeepPerson"><label class="form-check-label" for="chkKeepPerson">サムネイルは残す</label></div>
+                </div>
+                <div class="modal-footer"><button class="btn btn-light" type="button" data-bs-dismiss="modal">いいえ</button><button class="btn btn-primary" id="btnAnalyze" type="button" data-bs-dismiss="modal">はい</button></div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" role="dialog" tabindex="-1" id="mdlDelete">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">チェックした人物を削除する</h4><button class="btn-close" type="button" aria-label="Close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>この操作は元に戻せません.<br>よろしいですか？</p>
+                </div>
+                <div class="modal-footer"><button class="btn btn-light" type="button" data-bs-dismiss="modal">いいえ</button><button class="btn btn-primary" id="btnDelete" type="button" data-bs-dismiss="modal">はい</button></div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" role="dialog" tabindex="-1" id="mdlMerge">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">チェックした人物を統合する</h4><button class="btn-close" type="button" aria-label="Close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>この操作は元に戻せません.<br>よろしいですか？</p>
+                </div>
+                <div class="modal-footer"><button class="btn btn-light" type="button" data-bs-dismiss="modal">いいえ</button><button class="btn btn-primary" id="btnMerge" type="button" data-bs-dismiss="modal">はい</button></div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" role="dialog" tabindex="-1" id="mdlSave">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">解析結果を保存する</h4><button class="btn-close" type="button" aria-label="Close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>お使いのブラウザーのデフォルトのダウンロード場所に解析結果を<br>動画と同じ名前で保存します. 拡張子は .syosa になります.<br>保存した結果はファイル選択ダイアログで読み込むことができます.</p>
+                </div>
+                <div class="modal-footer"><button class="btn btn-light" type="button" data-bs-dismiss="modal">キャンセル</button><button class="btn btn-primary" id="btnSave" type="button" data-bs-dismiss="modal">保存</button></div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" role="dialog" tabindex="-1" id="mdlLoad">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">解析データの読み込み</h4><button class="btn-close" type="button" aria-label="Close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>現在の解析結果はクリアされます.<br>よろしいですか？</p>
+                </div>
+                <div class="modal-footer"><button class="btn btn-light" type="button" data-bs-dismiss="modal">いいえ</button><button class="btn btn-primary" id="btnLoad" type="button" data-bs-dismiss="modal">はい</button></div>
+            </div>
+        </div>
+    </div>
+    <div class="offcanvas offcanvas-top h-75" tabindex="-1" id="mdlSettings">
+        <div class="offcanvas-header text-bg-primary">
+            <h5 class="offcanvas-title text-primary-emphasis">設定</h5><button class="btn-close" type="button" aria-label="Close" data-bs-dismiss="offcanvas" data-bs-target="#mdlSettings"></button>
+        </div>
+        <div class="offcanvas-body">
+            <p class="text-bg-secondary">解析</p>
+            <div class="table-responsive">
+                <table class="table table-borderless">
+                    <tbody>
+                        <tr>
+                            <td class="w-25" style="vertical-align: middle;">フレームレート</td>
+                            <td class="d-flex flex-wrap"><span class="_range-label">低い</span><input class="form-range w-50" type="range" id="rngFramerate" min="0.1" max="30" step="0.1" value="10"><span class="_range-label">高い</span><span class="ms-5" _addon="rangevalue" _sourceid="rngFramerate">0</span><span>fps</span>
+                                <p class="w-100 mt-3" style="font-size: 12px;">1秒あたりの解析回数を設定します.&nbsp;フレームレートを低くすると短時間で全体の傾向を粗く把握することができます.<br>フレームレートを高くすると精度は向上しますが, 解析時間が長くなり使用メモリや保存ファイルの容量が大きくなります.</p>
+                            </td>
+                        </tr>
+                        <tr style="border-top-width: 1px;border-top-color: var(--bs-secondary-bg);">
+                            <td class="w-25"></td>
+                            <td class="d-flex flex-wrap"></td>
+                        </tr>
+                        <tr>
+                            <td class="w-25" style="vertical-align: middle;">最大検出人数</td>
+                            <td class="d-flex flex-wrap"><span class="_range-label">少ない</span><input class="form-range w-50" type="range" id="rngMaxDetected" min="1" max="8" step="1" value="2"><span class="_range-label">多い</span><span class="ms-5" _addon="rangevalue" _sourceid="rngMaxDetected">0</span><span>人</span>
+                                <p class="w-100 mt-3" style="font-size: 12px;">1フレームの中で同時に検出する人数の上限を設定します.<br>同時に登場する人数があらかじめ判っている場合は, 上限を設定することで解析性能が向上します.</p>
+                            </td>
+                        </tr>
+                        <tr style="border-top-width: 1px;border-top-color: var(--bs-secondary-bg);">
+                            <td class="w-25"></td>
+                            <td class="d-flex flex-wrap"></td>
+                        </tr>
+                        <tr>
+                            <td class="w-25" style="vertical-align: middle;">顔の判定許容度</td>
+                            <td class="d-flex flex-wrap"><span class="_range-label">緩い</span><input class="form-range w-50" type="range" id="rngFaceScore" min="0" max="1" step="0.01" value="1"><span class="_range-label">厳しい</span><span class="ms-5" _addon="rangevalue" _sourceid="rngFaceScore">0</span>
+                                <p class="w-100 mt-3" style="font-size: 12px;">判定許容度を緩くすると, 顔以外の物体が顔として検出される頻度が増えます.<br>判定許容度を厳しくすると, アングルや画質によっては顔として認識されないことがあります.</p>
+                            </td>
+                        </tr>
+                        <tr style="border-top-width: 1px;border-top-color: var(--bs-secondary-bg);">
+                            <td class="w-25"></td>
+                            <td class="d-flex flex-wrap"></td>
+                        </tr>
+                        <tr>
+                            <td class="w-25" style="vertical-align: middle;">人物の識別感度</td>
+                            <td class="d-flex flex-wrap"><span class="_range-label">低い</span><input class="form-range w-50" type="range" id="rngSimilarity" min="0.2" max="0.8" step="0.01" value="0.5"><span class="_range-label">高い</span><span class="ms-5" _addon="rangevalue" _sourceid="rngSimilarity">0</span>
+                                <p class="w-100 mt-3" style="font-size: 12px;">識別感度を低くすると, 異なる人物を同一人物と判定し新しい人物が追加されにくくなります.<br>識別感度を高くすると, 同一人物が異なる人物として追加されやすくなります.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-bg-secondary">表示</p>
+            <div class="table-responsive">
+                <table class="table table-borderless">
+                    <tbody>
+                        <tr>
+                            <td class="w-25" style="vertical-align: middle;">再生中に解析結果を表示する</td>
+                            <td>
+                                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="chkDrawHuman"><label class="form-check-label" for="chkDrawHuman"></label></div>
+                                <p class="w-100 mt-3" style="font-size: 12px;">解析を始めるまでは表示されません. 解析中は常に表示されません.</p>
+                            </td>
+                        </tr>
+                        <tr style="border-top-width: 1px;border-top-color: var(--bs-secondary-bg);">
+                            <td class="w-25"></td>
+                            <td class="d-flex flex-wrap"></td>
+                        </tr>
+                        <tr>
+                            <td class="w-25" style="vertical-align: middle;">グラフを同期する</td>
+                            <td>
+                                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="chkSyncGraph" checked=""><label class="form-check-label" for="chkSyncGraph"></label></div>
+                                <p class="w-100 mt-3" style="font-size: 12px;">表示が遅くなる場合はオフにしてください.</p>
+                            </td>
+                        </tr>
+                        <tr style="border-top-width: 1px;border-top-color: var(--bs-secondary-bg);">
+                            <td class="w-25"></td>
+                            <td class="d-flex flex-wrap"></td>
+                        </tr>
+                        <tr>
+                            <td class="w-25" style="vertical-align: middle;">ツールチップを表示する</td>
+                            <td>
+                                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="chkShowTooltip" checked=""><label class="form-check-label" for="chkShowTooltip"></label></div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div id="divSplash" class="_splash _fade-out _hide" _addon="splash">
+        <div class="d-flex flex-column align-items-center" style="margin-top: 30vh;"><span class="fs-2 text-light mb-3" data-none="" data-loading="学習モデルを読み込んでいます ..." data-warmup="解析の準備中です ..." data-analyzing="解析しています ..." data-drawing="グラフを作成しています ...">ステータス</span><span class="spinner-border spinner-border-sm text-primary" role="status" style="width: 5rem;height: 5rem;font-size: 4rem;"></span><button class="btn btn-primary mt-5" id="btnStop" type="button">中止</button></div>
+    </div>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/global.js"></script>
+    <script src="assets/js/disablednd.js"></script>
+    <script src="assets/js/videocontroller.js"></script>
+    <script src="assets/js/analyzer.js"></script>
+    <script src="assets/js/fileloader.js"></script>
+    <script src="assets/js/graph.js"></script>
+    <script src="assets/js/splash.js"></script>
+    <script src="assets/js/timeline.js"></script>
+    <script src="assets/js/autoheight.js"></script>
+    <script src="assets/js/autoscroll.js"></script>
+    <script src="assets/js/tooltip.js"></script>
+    <script src="assets/js/rangevalue.js"></script>
 </body>
-
-</html>
 
 </html>

@@ -1,0 +1,36 @@
+._fileinput {
+  width: 100%;
+  padding: 5rem 0;
+  background-color: var(--bs-gray-300);
+  outline: 0.125rem dashed var(--bs-primary);
+  outline-offset: -0.5rem;
+  font-size: 0;
+}
+
+._fileinput:hover {
+  background-color: var(--bs-gray-200);
+}
+
+._fileinput::file-selector-button {
+  background-color: rgba(0, 0, 0, 0);
+  border: none;
+}
+
+._fileinput ~ svg {
+  position: absolute;
+  opacity: 0.15;
+  font-size: 6rem;
+  pointer-events: none;
+}
+
+._fileinput ~ label {
+  position: absolute;
+  margin-right: 1.5rem;
+  margin-left: 1.5rem;
+  color: var(--bs-primary);
+  font-size: 1.25rem;
+  font-weight: bolder;
+  text-align: center;
+  pointer-events: none;
+}
+
