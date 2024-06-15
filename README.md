@@ -1,7 +1,7 @@
 # 所作(syosa)
 
 <p align="center">
-  <img width="75%" src="syosa-process.png" />
+  <img width="75%" src="docs/assets/syosa-process.png" />
 </p>
 
 ## About
@@ -26,7 +26,7 @@
 - 表情
 
 <p align="center">
-  <img width="75%" src="syosa-visualization.png" />
+  <img width="75%" src="docs/assets/syosa-visualization.png" />
 </p>
 
 また，認識した結果をタイムグラフに合わせて表示でき，必要に応じて可視化内容は変更できる．表情は，基本的な6つの感情（怒り・嫌悪・恐怖・喜び・悲しみ・驚き）の比率で表示される．横軸のタイムスケールは拡大縮小可能である．身体情報としては，頷きなどに関連する頭部の姿勢情報の可視化される．ジェスチャーについても認識したものをタイムライン上に表示される．
