@@ -1,0 +1,24 @@
+@media (min-width: 1200px) {
+  .container {
+    max-width: 960px;
+  }
+}
+
+._hide {
+  visibility: hidden;
+}
+
+._highlight {
+  outline: 0.25rem solid var(--bs-primary);
+  outline-offset: -0.25rem;
+}
+
+._range-label {
+  width: 4rem;
+  text-align: center;
+}
+
+._clickable-icon[disabled] {
+  opacity: 0.5;
+}
+

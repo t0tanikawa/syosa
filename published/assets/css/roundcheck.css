@@ -1,0 +1,43 @@
+._roundcheck {
+  --size: 1.2rem;
+}
+
+._roundcheck input {
+  opacity: 0;
+}
+
+._roundcheck label {
+  position: relative;
+  margin-left: -1.5rem;
+}
+
+._roundcheck label::before {
+  content: "";
+  position: absolute;
+  top: calc(var(--size) / -3);
+  left: calc(var(--size) / -3);
+  width: var(--size);
+  height: var(--size);
+  background-color: var(--bs-white);
+  border: 0.1rem solid var(--bs-gray-400);
+  border-radius: 100%;
+}
+
+._roundcheck input:checked ~ label::before {
+  background-color: var(--bs-primary);
+  border: none;
+}
+
+._roundcheck input:checked ~ label::after {
+  content: "";
+  position: absolute;
+  top: calc(var(--size) / -3.5);
+  left: calc(var(--size) / -4);
+  width: calc(var(--size) / 1.5);
+  height: calc(var(--size) / 2);
+  border-bottom: 0.125rem solid var(--bs-white);
+  border-left: 0.125rem solid var(--bs-white);
+  border-radius: 10%;
+  transform: rotate(-45deg);
+}
+
