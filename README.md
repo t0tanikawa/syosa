@@ -40,35 +40,21 @@
 ## Acknowledgment
 本ツールは，大学共同利用機関法人人間文化研究機構の2023年度デジタル・ヒューマニティーズ(DH)研究等補助事業の支援を受けて開発された．
 
-## leicense
-プログラムおよび学習データについて以下のライセンス形態により個人利用および非商用利用において公開・使用・再配布を行う．
+## Credits
+本プログラムは以下のライブラリおよび学習データを使用している．
 ```
 Human Library: MIT License
-SSR-Net: Apache License Version 2
-Real-of-Fake: 未使用（Face Anti-Spoofing）
-BlazePose: Apache License Version 2
-EfficientPose: Apache License Version 2
-MoveNet: Apache License Version 2(TensorFlow)
-PoseNet: Apache License Version 2(TensorFlow)
-MediaPipe Meet: Google Terms of Service
-MediaPipe Selfie: Apache License Version 2
-Robust Video Matting: GNU General Public License v3.0
-Oarriaga: MIT License
-HSE-AffectNet: Apache License Version 2
-MediaPipe Iris: Apache License Version 2
-HSE-FaceRes: Apache License Version 2
-MediaPipe BlazeFace: Apache License Version 2
-BecauseofAI MobileFace: MIT License
-DeepInsight InsightFace: MIT License
-MediaPipe FaceMesh: Apache License Version 2
-MediaPipe FaceMesh Attention Variation: Apache License Version 2
-GEAR Predictor: GNU General Public License v3.0
-MediaPipe HandPose: Apache License Version 2
-HandTracking: MIT License
-WebGLImageFilter: MIT License
-MB3-CenterNet: 未使用（Object Detection）
-NanoDet: Apache License Version 2
-Pinto: MIT License
-CanvasJS: 個人利用・非商用利用は無償（クレジットおよびリンク必須）
+Used Models:
+  PoseNet: Apache License Version 2(TensorFlow)
+  Oarriaga Emotion: MIT License
+  MediaPipe Iris: Apache License Version 2
+  HSE-FaceRes: Apache License Version 2
+  MediaPipe BlazeFace: Apache License Version 2
+  MediaPipe FaceMesh: Apache License Version 2
+  MediaPipe HandLandmark Lite: Apache License Version 2
+  HandTracking: MIT License
+ChartJS: MIT License
+Hammer.js: MIT License
+Moment.js: MIT License
 Bootstrap: MIT License
 ```
