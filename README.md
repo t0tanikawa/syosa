@@ -1,4 +1,4 @@
-# 所作(syosa)
+# syosa: 映像資料からの非言語情報の取得・メタデータ化ツール
 
 <p align="center">
   <img width="75%" src="docs/assets/syosa-process.png" />
