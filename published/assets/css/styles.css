@@ -4,13 +4,13 @@
   }
 }
 
-._hide {
-  visibility: hidden;
-}
-
 ._highlight {
   outline: 0.25rem solid var(--bs-primary);
   outline-offset: -0.25rem;
+}
+
+._font-note {
+  font-size: 0.75rem;
 }
 
 ._range-label {

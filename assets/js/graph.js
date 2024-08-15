@@ -1,18 +1,9 @@
 'use strict';
 
 document.addEventListener('DOMContentLoaded', { addonName: Static.selfJS(), handleEvent: function () {
-	const UNCHECKALLBUTTONID_ATTR_NAME = '_uncheckallbuttonid';
-	const RESETZOOMBUTTONID_ATTR_NAME = '_resetzoombuttonid';
-	const DELETEMODALBUTTONID_ATTR_NAME = '_deletemodalbuttonid';
-	const MERGEMODALBUTTONID_ATTR_NAME = '_mergemodalbuttonid';
-	const SYNCGRAPHCHECKBOXID_ATTR_NAME = '_syncgraphcheckboxid';
-
 	document.querySelectorAll(`[${Static.ADDON_ATTR_NAME}~="${this.addonName}"]`).forEach(element => {
-		const uncheckAllButton = element.getElementFromAttribute(UNCHECKALLBUTTONID_ATTR_NAME);
-		const resetZoomButton = element.getElementFromAttribute(RESETZOOMBUTTONID_ATTR_NAME);
-		const deleteModalButton = element.getElementFromAttribute(DELETEMODALBUTTONID_ATTR_NAME);
-		const mergeModalButton = element.getElementFromAttribute(MERGEMODALBUTTONID_ATTR_NAME);
-		const syncGraphCheckbox = element.getElementFromAttribute(SYNCGRAPHCHECKBOXID_ATTR_NAME);
+		Static.registerElement(element);
+
 		const template = element.getElementsByTagName('template')[0];
 		if (!template)
 			return;
@@ -74,7 +65,7 @@ document.addEventListener('DOMContentLoaded', { addonName: Static.selfJS(), hand
 			}
 
 			function syncGraph(event) {
-				if (syncGraphCheckbox && syncGraphCheckbox.checked) {
+				if (enabledSyncGraph) {
 					Chart.helpers.each(Chart.instances, instance => {
 						if (instance == event.chart) 
 							return;
@@ -169,14 +160,12 @@ document.addEventListener('DOMContentLoaded', { addonName: Static.selfJS(), hand
 			};
 		}
 
-		if (deleteModalButton)
-			Static.disableInput(deleteModalButton);
+		let video = null;
+		let initialDuration = 0;
+		//let drawn = [];
 
-		if (mergeModalButton)
-			Static.disableInput(mergeModalButton);
-
-		let video;
-		let initialDuration;
+		// default value will set immediately after DOM loaded by config
+		let enabledSyncGraph = false;
 
 		element._selections = [];
 		element._names = [];
@@ -184,36 +173,28 @@ document.addEventListener('DOMContentLoaded', { addonName: Static.selfJS(), hand
 		element._angleCharts = [];
 		element._gestureCharts = [];
 
-		element.addEventListener(Static.EVENT_INIT, event => {
+		element.addEventListener(Static.EVENT_INITGRAPH, event => {
 			// should delete all event listeners before remove element?
 
 			video = event.detail?.video;
 
+			if (event.detail?.refsCB !== undefined) {
+				event.detail.refsCB({
+					selections: element._selections,
+					names: element._names
+				});
+			}
+
 			if (event.detail?.keepGraph) {
 				element._emotionCharts.forEach(chart => {
-					/*
-					const canvas = chart.canvas;
-					chart.destroy();
-					chart = new Chart(canvas, new EmotionChartConfiguration);
-					*/
 					chart.data.labels.length = 0;
 					chart.data.datasets.forEach(dataset => dataset.data.length = 0);
 				});
 				element._angleCharts.forEach(chart => {
-					/*
-					const canvas = chart.canvas;
-					chart.destroy();
-					chart = new Chart(canvas, new AngleChartConfiguration);
-					*/
 					chart.data.labels.length = 0;
 					chart.data.datasets.forEach(dataset => dataset.data.length = 0);
 				});
 				element._gestureCharts.forEach(chart => {
-					/*
-					const canvas = chart.canvas;
-					chart.destroy();
-					chart = new Chart(canvas, new GestureChartConfiguration);
-					*/
 					chart.data.labels.length = 0;
 					chart.data.datasets.length = 0;
 				});
@@ -234,10 +215,12 @@ document.addEventListener('DOMContentLoaded', { addonName: Static.selfJS(), hand
 				Array.from(event.currentTarget.children).filter(child => child.tagName == 'DIV').forEach(child => child.remove());
 			}
 
+			//drawn.length = 0;
+
 			uncheckAll();
 		});
 
-		element.addEventListener(Static.EVENT_ADDPERSON, event => {
+		element.addEventListener(Static.EVENT_ADDGRAPH, event => {
 			const index = element.childElementCount - 1;
 
 			// duplicate a new item
@@ -316,6 +299,15 @@ document.addEventListener('DOMContentLoaded', { addonName: Static.selfJS(), hand
 
 			// for each frame
 			analyzedData.results.forEach((result, t) => {
+				/*
+				// skip if already drawn
+				if (drawn[t])
+					return;
+
+				// mark as drawn
+				drawn[t] = true;
+				*/
+
 				// push current frame time as new label to emotion chart and angle chart
 				element._emotionCharts.forEach(chart => chart.data.labels.push(absMSec(result.time)));
 				element._angleCharts.forEach(chart => chart.data.labels.push(absMSec(result.time)));
@@ -340,7 +332,7 @@ document.addEventListener('DOMContentLoaded', { addonName: Static.selfJS(), hand
 					if (angleChart) {
 						angleChart.data.datasets.forEach(dataset => {
 							const angle = personResult.result.face.rotation.angle[dataset.label];
-							dataset.data[t] = angle != undefined ? angle : 0.0;
+							dataset.data[t] = angle ?? 0.0;
 						});
 					}
 
@@ -371,20 +363,29 @@ document.addEventListener('DOMContentLoaded', { addonName: Static.selfJS(), hand
 			});
 		});
 
-		if (uncheckAllButton) {
-			uncheckAllButton.addEventListener('click', event => {
-				uncheckAll();
-			});
-		}
+		element.addEventListener('button-uncheckall', event => {
+			uncheckAll();
+		});
 
-		if (resetZoomButton) {
-			resetZoomButton.addEventListener('click', event => {
-				Chart.helpers.each(Chart.instances, instance => {
-					//resetScale(instance);
-					setInitialScale(instance, initialDuration);
-				});
+		element.addEventListener('button-resetzoom', event => {
+			Chart.helpers.each(Chart.instances, instance => {
+				setInitialScale(instance, initialDuration);
 			});
-		}
+		});
+
+		// update parameters
+		element.addEventListener('config-syncgraph', event => {
+			if (event.detail?.target?.checked !== undefined)
+				enabledSyncGraph = event.detail.target.checked;
+		});
+
+		element.addEventListener('config-animationgraph', event => {
+			if (event.detail?.target?.checked !== undefined) {
+				Chart.helpers.each(Chart.instances, instance => {
+					instance.options.animation = event.detail.target.checked;
+				});
+			}
+		});
 
 		function setInitialScale(chart, duration) {
 			initialDuration = duration;
@@ -394,12 +395,6 @@ document.addEventListener('DOMContentLoaded', { addonName: Static.selfJS(), hand
 			chart.options.plugins.zoom.limits.x.min = absMSec(0);
 			chart.options.plugins.zoom.limits.x.max = absMSec(duration);
 			chart.update();
-		}
-
-		function resetScale(chart) {
-			chart.options.scales.x.min = absMSec(0);
-			chart.options.scales.x.max = absMSec(initialDuration);
-			chart.resetZoom();
 		}
 
 		function uncheckAll() {
@@ -416,19 +411,12 @@ document.addEventListener('DOMContentLoaded', { addonName: Static.selfJS(), hand
 		}
 
 		function updateModalButton() {
-			if (deleteModalButton) {
-				if (element._selections.length > 0)
-					Static.enableInput(deleteModalButton);
-				else
-					Static.disableInput(deleteModalButton);
-			}
-
-			if (mergeModalButton) {
-				if (element._selections.length > 1)
-					Static.enableInput(mergeModalButton);
-				else
-					Static.disableInput(mergeModalButton);
-			}
+			if (element._selections.length == 0)
+				Static.dispatchEvent(Static.EVENT_CHANGESTATE, { state: 'graph-select-none' });
+			else if (element._selections.length == 1)
+				Static.dispatchEvent(Static.EVENT_CHANGESTATE, { state: 'graph-select-single' });
+			else if (element._selections.length > 1)
+				Static.dispatchEvent(Static.EVENT_CHANGESTATE, { state: 'graph-select-multi' });
 		}
 
 		function absMSec(s) {

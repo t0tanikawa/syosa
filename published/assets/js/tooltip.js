@@ -1,16 +1,16 @@
 'use strict';
 
-document.addEventListener('DOMContentLoaded', { addonName: Static.selfJS(), handleEvent: function () {
-	const showTooltip = document.getElementById('chkShowTooltip');
+document.addEventListener('DOMContentLoaded', () => {
+	[...document.getElementsByClassName('_tooltip')].forEach(tooltip => {
+		Static.registerElement(tooltip);
 
-	if (showTooltip) {
-		showTooltip.addEventListener('change', event => {
-			[...document.getElementsByClassName('_tooltip')].forEach(tooltip => {
-				if (event.currentTarget.checked)
+		tooltip.addEventListener('config-showtooltip', event => {
+			if (event.detail?.target?.checked !== undefined) {
+				if (event.detail.target.checked)
 					tooltip.removeAttribute('_notooltip');
 				else
 					tooltip.setAttribute('_notooltip', '');
-			});
+			}
 		});
-	}
-} });
+	});
+});

@@ -5,19 +5,18 @@ class Static {
 	// common attribute names
 	static ADDON_ATTR_NAME = '_addon';
 
-	static _BS_CLASS_DISABLED = 'disabled';
-
 	// custom event names
-	static EVENT_ENABLE = '_enable';
-	static EVENT_DISABLE = '_disable';
+	static EVENT_SHOWSPLASH = '_showsplash';
+	static EVENT_HIDESPLASH = '_hidesplash';
 	static EVENT_SHOWBUTTON = '_showbutton';
 	static EVENT_HIDEBUTTON = '_hidebutton';
 	static EVENT_UPDATESTATUS = '_updatestatus';
-	static EVENT_LOAD = '_load';
-	static EVENT_SCROLL = '_scroll';
-	static EVENT_INIT = '_init';
-	static EVENT_ADDPERSON = '_addperson';
+	static EVENT_LOADANALYZEDDATA = '_loadanalyzeddata';
+	static EVENT_LOADTIMELINE = '_loadtimeline';
+	static EVENT_INITGRAPH = '_initgraph';
+	static EVENT_ADDGRAPH = '_addgraph';
 	static EVENT_DRAWGRAPH = '_drawgraph';
+	static EVENT_CHANGESTATE = '_changestate';
 
 	static selfJS() {
 		if (document.currentScript) {
@@ -34,7 +33,29 @@ class Static {
 		}
 	}
 
-	static animationFrameFactory = function (func) {
+	static _dispatchTargets = [];
+	static _events = [];
+
+	static registerElement(element) {
+		this._dispatchTargets.push(element);
+	}
+
+	static unregisterElement(element) {
+		this._dispatchTargets = this._dispatchTargets.filter(target => target != element);
+	}
+
+	static dispatchEvent(type, detail) {
+		if (!type) {
+			console.warn('Static.dispatchEvent(): Type of CustomEvent not defined.');
+			return;
+		}
+
+		this._dispatchTargets.forEach(target => {
+			target.dispatchEvent(new CustomEvent(type, { detail }));
+		});
+	}
+
+	static animationFrameFactory(func) {
 		const id = {};
 		const callback = function () {
 			func();
@@ -43,35 +64,19 @@ class Static {
 		id.id = requestAnimationFrame(callback);
 		return id;
 	};
-
-	static enableInput = function (element) {
-		if (!element)
-			return;
-
-		element.classList.remove(this._BS_CLASS_DISABLED);
-		element.disabled = false;
-	};
-
-	static disableInput = function (element) {
-		if (!element)
-			return;
-
-		element.classList.add(this._BS_CLASS_DISABLED);
-		element.disabled = true;
-	};
 }
 
 // class extensions
 Element.prototype.getElementFromAttribute = function (attributeName) {
 	const id = this.getAttribute(attributeName);
 	if (!id) {
-		console.log(`${this.nodeName}: Attribute ${attributeName} not defined.`);
+		console.warn(`${this.nodeName}: Attribute ${attributeName} not defined.`);
 		return;
 	}
 
 	const element = document.getElementById(id);
 	if (!element) {
-		console.log(`${this.nodeName}: Element not found: ${id}`);
+		console.warn(`${this.nodeName}: Element not found: ${id}`);
 		return;
 	}
 
@@ -81,7 +86,7 @@ Element.prototype.getElementFromAttribute = function (attributeName) {
 Element.prototype.getElementsFromAttribute = function (attributeName) {
 	const ids = this.getAttribute(attributeName);
 	if (!ids) {
-		console.log(`${this.nodeName}: Attribute ${attributeName} not defined.`);
+		console.warn(`${this.nodeName}: Attribute ${attributeName} not defined.`);
 		return;
 	}
 

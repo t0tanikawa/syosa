@@ -2,11 +2,11 @@
 
 document.addEventListener('DOMContentLoaded', { addonName: Static.selfJS(), handleEvent: function () {
 	const VIDEOID_ATTR_NAME = '_videoid';
-	const FRAMERATERANGEID_ATTR_NAME = '_frameraterangeid';
 
 	document.querySelectorAll(`[${Static.ADDON_ATTR_NAME}~="${this.addonName}"]`).forEach(element => {
+		Static.registerElement(element);
+
 		const video = element.getElementFromAttribute(VIDEOID_ATTR_NAME);
-		const framerateRange = element.getElementFromAttribute(FRAMERATERANGEID_ATTR_NAME);
 
 		// assumes that each input element for control are layouted in a specified order
 		const play = element.getElementsByTagName('input')[0];
@@ -21,90 +21,94 @@ document.addEventListener('DOMContentLoaded', { addonName: Static.selfJS(), hand
 		if (!video)
 			return;
 
-		let seekSpan = 0;
+		let duration = '';
+		let isSeeking = false;
+
+		// default value will set immediately after DOM loaded by config
+		let framerate = 1;
+
+		element.addEventListener('config-framerate', event => {
+			if (event.detail?.target?.value !== undefined)
+				framerate = Number(event.detail.target.value);
+		});
+
+		video.addEventListener('loadeddata', event => {
+			Static.dispatchEvent(Static.EVENT_CHANGESTATE, { state: 'videocontroller-video-ready' });
+			Static.dispatchEvent(Static.EVENT_CHANGESTATE, { state: 'videocontroller-video-stop' });
+
+			event.currentTarget.currentTime = 0;
+
+			if (timecode)
+				duration = new Date(event.currentTarget.duration * 1000).toISOString().slice(11,19);
+		});
+
+		video.addEventListener('ended', event => {
+			Static.dispatchEvent(Static.EVENT_CHANGESTATE, { state: 'videocontroller-video-stop' });
+
+			if (!isSeeking)
+				event.currentTarget.currentTime = 0;
+		});
+
+		video.addEventListener('pause', event => {
+			Static.dispatchEvent(Static.EVENT_CHANGESTATE, { state: 'videocontroller-video-stop' });
+		});
+
+		video.addEventListener('play', event => {
+			Static.dispatchEvent(Static.EVENT_CHANGESTATE, { state: 'videocontroller-video-play' });
+		});
+
+		video.addEventListener('timeupdate', event => {
+			if (seek)
+				seek.value = event.currentTarget.currentTime / event.currentTarget.duration;
+
+			if (timecode)
+				timecode.textContent = new Date(event.currentTarget.currentTime * 1000).toISOString().slice(11,19) + ' / ' + duration;
+		});
 
 		if (play) {
-			Static.disableInput(play);
-
 			play.addEventListener('change', event => {
 				if (event.currentTarget.checked)
 					video.play();
 				else
 					video.pause();
 			});
-
-			video.addEventListener('loadeddata', event => {
-				play.checked = false;
-				Static.enableInput(play);
-			});
-
-			video.addEventListener('ended', event => {
-				play.checked = false;
-			});
-
-			video.addEventListener('pause', event => {
-				play.checked = false;
-			});
-
-			video.addEventListener('play', event => {
-				play.checked = true;
-			});
 		}
 
 		if (prev) {
-			prev.setAttribute('disabled', '');
-
 			prev.addEventListener('click', event => {
 				if (!prev.hasAttribute('disabled') && video.paused)
-					video.currentTime -= seekSpan;
-			});
-
-			video.addEventListener('loadeddata', event => {
-				prev.removeAttribute('disabled');
+					video.currentTime -= 1 / framerate;
 			});
 		}
 
 		if (seek) {
-			Static.disableInput(seek);
 			seek.value = 0;
 
 			seek.addEventListener('input', event => {
 				video.currentTime = video.duration * event.currentTarget.value;
 			});
 
-			video.addEventListener('loadeddata', event => {
-				seek.value = 0;
-				Static.enableInput(seek);
+			seek.addEventListener('mousedown', event => {
+				isSeeking = true;
 			});
 
-			video.addEventListener('timeupdate', event => {
-				seek.value = event.currentTarget.currentTime / event.currentTarget.duration;
+			seek.addEventListener('mouseup', event => {
+				isSeeking = false;
+			});
+
+			seek.addEventListener('keydown', event => {
+				isSeeking = true;
+			});
+
+			seek.addEventListener('keyup', event => {
+				isSeeking = false;
 			});
 		}
 
 		if (next) {
-			next.setAttribute('disabled', '');
-
 			next.addEventListener('click', event => {
 				if (!next.hasAttribute('disabled') && video.paused)
-					video.currentTime += seekSpan;
-			});
-
-			video.addEventListener('loadeddata', event => {
-				next.removeAttribute('disabled');
-			});
-		}
-
-		if (timecode) {
-			let duration = '';
-
-			video.addEventListener('loadeddata', event => {
-				duration = new Date(event.currentTarget.duration * 1000).toISOString().slice(11,19);
-				event.currentTarget.dispatchEvent(new Event('timeupdate'));
-			});
-
-			video.addEventListener('timeupdate', event => {
-				timecode.textContent = new Date(event.currentTarget.currentTime * 1000).toISOString().slice(11,19) + ' / ' + duration;
+					video.currentTime += 1 / framerate;
 			});
 		}
 
@@ -114,9 +118,9 @@ document.addEventListener('DOMContentLoaded', { addonName: Static.selfJS(), hand
 
 				if (volume) {
 					if (event.currentTarget.checked)
-						Static.disableInput(volume);
+						Static.dispatchEvent(Static.EVENT_CHANGESTATE, { state: 'videocontroller-mute' });
 					else
-						Static.enableInput(volume);
+						Static.dispatchEvent(Static.EVENT_CHANGESTATE, { state: 'videocontroller-unmute' });
 				}
 			});
 			mute.dispatchEvent(new Event('change'));
@@ -130,29 +134,10 @@ document.addEventListener('DOMContentLoaded', { addonName: Static.selfJS(), hand
 		}
 
 		if (split) {
-			split.setAttribute('disabled', '');
-
 			split.addEventListener('click', event => {
 				if (!split.hasAttribute('disabled'))
 					// not implemented
 					return;
-			});
-
-			// do not activate until implement finished
-			/*
-			video.addEventListener('loadeddata', event => {
-				split.removeAttribute('disabled');
-			});
-			*/
-		}
-
-		if (framerateRange) {
-			framerateRange.addEventListener('change', event => {
-				seekSpan = 1 / framerateRange.value;
-			});
-
-			video.addEventListener('loadeddata', event => {
-				framerateRange.dispatchEvent(new Event('change'));
 			});
 		}
 	});

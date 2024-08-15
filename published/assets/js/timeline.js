@@ -2,6 +2,8 @@
 
 document.addEventListener('DOMContentLoaded', { addonName: Static.selfJS(), handleEvent: function () {
 	document.querySelectorAll(`[${Static.ADDON_ATTR_NAME}~="${this.addonName}"]`).forEach(element => {
+		Static.registerElement(element);
+
 		const template = element.getElementsByTagName('template')[0];
 		if (!template)
 			return;
@@ -10,8 +12,16 @@ document.addEventListener('DOMContentLoaded', { addonName: Static.selfJS(), hand
 		if (!list)
 			return;
 
-		element.addEventListener(Static.EVENT_LOAD, event => {
-			const video = event.detail?.video;
+		let video = null;
+
+		// default value will set immediately after DOM loaded by config
+		let autoscroll = false;
+
+		element.addEventListener(Static.EVENT_LOADTIMELINE, event => {
+			if (video)
+				video.removeEventListener('timeupdate', scroll);
+
+			video = event.detail?.video;
 
 			Array.from(list.children).filter(child => child.tagName == 'LI').forEach(child => child.remove());
 
@@ -33,17 +43,26 @@ document.addEventListener('DOMContentLoaded', { addonName: Static.selfJS(), hand
 						video.currentTime = event.currentTarget.parentNode._cueTime;
 				});
 			}
+
+			if (video)
+				video.addEventListener('timeupdate', scroll);
 		});
 
-		element.addEventListener(Static.EVENT_SCROLL, event => {
-			const time = event.detail?.time;
-			if (!time)
+		element.addEventListener('config-autoscroll', event => {
+			if (event.detail?.target?.checked !== undefined)
+				autoscroll = event.detail.target.checked;
+		});
+
+		function scroll(event) {
+			if (!autoscroll)
 				return;
+
+			const time = event.currentTarget.currentTime;
 
 			const item = Array.from(list.children).filter(child => child.tagName == 'LI').reduce((acc, val) =>
 					Math.abs(val._cueTime - time) < Math.abs(acc._cueTime - time) ? val : acc);
 
 			item.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
-		});
+		}
 	});
 } });
